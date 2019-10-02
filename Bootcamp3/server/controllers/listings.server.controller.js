@@ -53,29 +53,81 @@ exports.read = function(req, res) {
   res.json(req.listing);
 };
 
+
 /* Update a listing - note the order in which this function is called by the router*/
 exports.update = function(req, res) {
-  var listing = req.listing;
 
   /* Replace the listings's properties with the new properties found in req.body */
- 
-  /*save the coordinates (located in req.results if there is an address property) */
+	var this_listing = req.listing;
+	var new_listing = new Listing(req.body);
+		console.log("======");
+		console.log(this_listing);
+		console.log("======");
+		console.log(new_listing);
+		console.log("======");
+
+		if(req.results) {
+				changes = {
+						name: new_listing.name,
+						code: new_listing.code,
+						address: new_listing.address,
+						coordinates: {
+								latitude: req.results.lat,
+								longitude: req.results.lng
+						}
+				}
+		} else {
+				changes = {
+						name: new_listing.name,
+						code: new_listing.code,
+						address: new_listing.address
+				}
+		};
  
   /* Save the listing */
-
+		Listing.findOneAndUpdate({_id: this_listing._id}, changes, {new: true}, function (err, resp) {
+				if (err) {
+						console.log(err)
+						res.status(400).send(err);
+				} else {
+						res.json(resp);
+						console.log(resp);
+				}
+		});
 };
+
 
 /* Delete a listing */
 exports.delete = function(req, res) {
-  var listing = req.listing;
-
+		var listing = req.listing;
+		console.log("ASDF");
+		console.log(listing);
+		console.log("ASDF");
+		Listing.findByIdAndRemove({_id: listing._id}, function (err) {
+				if (err) {
+						console.log(err);
+						res.status(400).send(err);
+				} else {
+						res.status(200);
+						res.end();
+				};
+		});
   /* Add your code to remove the listins */
-
 };
+
 
 /* Retreive all the directory listings, sorted alphabetically by listing code */
 exports.list = function(req, res) {
   /* Add your code */
+		Listing.find({}, null, {sort: {code: 1}}, function(err, listing) {
+				if (err) {
+						throw err;
+						res.status(400).send(err);
+				} else {
+						res.json(listing);
+						console.log(listing);
+				}
+		});
 };
 
 /* 

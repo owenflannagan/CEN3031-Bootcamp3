@@ -1,4 +1,4 @@
-var should = require('should'), 
+var should = require('should')
     request = require('supertest'), 
     express = require('../config/express'), 
     Listing = require('../models/listings.server.model.js');
